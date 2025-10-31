@@ -4,13 +4,13 @@ import { useEffect, useState } from "react";
 import QuestionCard from "./QuestionCard";
 import { useNavigate } from "react-router-dom";
 
-const API_URL = "https://opentdb.com/api.php?amount=10&category=31&difficulty=easy&type=multiple"
+const API_URL =  import.meta.env.VITE_API_URL
 
 export default function Question() {
 
     const navigate = useNavigate();
     const backHome = () => {
-        navigate('/');
+        navigate('/home');
     }
 
     const [questions, setQuestions] = useState([]);
@@ -114,8 +114,10 @@ export default function Question() {
     // Card Pertanyaan
     return (
         <>
-            <div className="min-h-screen flex items-center justify-center">
-                {timer}
+            <div className="min-h-screen flex flex-col items-center justify-center">
+                <div className="pb-10 font-bold text-lg">
+                    {timer}
+                </div>
                 <QuestionCard
                     question={questions[current]}
                     questionNumber={current + 1}
