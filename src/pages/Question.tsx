@@ -7,6 +7,12 @@ import { useNavigate } from "react-router-dom";
 const API_URL = "https://opentdb.com/api.php?amount=10&category=31&difficulty=easy&type=multiple"
 
 export default function Question() {
+
+    const navigate = useNavigate();
+    const backHome = () => {
+        navigate('/');
+    }
+
     const [questions, setQuestions] = useState([]);
     const [current, setCurrent] = useState(0);
     const [score, setScore] = useState(0);
@@ -15,17 +21,12 @@ export default function Question() {
     const [finished, setFinished] = useState(false);
     const [loading, setLoading] = useState(true);
 
-    const navigate = useNavigate();
-
-    const backHome = () => {
-        navigate('/');
-    }
-
+    // Fetch Data API
     useEffect(() => {
         fetch(API_URL)
             .then((res) => res.json())
             .then((data) => {
-                const formatted = data.results.map((q) => ({
+                const formatted = data.results.map((q: any) => ({
                     question: q.question,
                     correct: q.correct_answer,
                     answers: [...q.incorrect_answers, q.correct_answer],
@@ -35,7 +36,27 @@ export default function Question() {
             })
     }, []);
 
-    const handleAnswer = (answer: string): void => {        
+     // Timer Countdown
+    const [timer, setTimer] = useState(15);
+    useEffect(() => {
+        if (finished || loading) return;
+        const timer = setInterval(() => {
+            setTimer((prev) => {
+                if (prev <= 1) {
+                    clearInterval(timer);
+                    setFinished(true);
+                    return 0;
+                }
+                return prev - 1;
+            });
+        }, 1000);
+
+        // Bersihkan interval saat komponen unmount
+        return () => clearInterval(timer);
+    }, [finished, loading]);
+
+    // Handler Jawaban + Hitung benar salah
+    const handleAnswer = (answer: string): void => {
         if (answer === questions[current].correct) {
             setScore((prev) => prev + 1);
             setCorrectAnswer((prev) => prev + 1);
@@ -51,6 +72,7 @@ export default function Question() {
         }
     };
 
+    // Loading Page
     if (loading)
         return (
             <div className="min-h-screen flex items-center justify-center">
@@ -58,6 +80,7 @@ export default function Question() {
             </div>
         )
 
+    // Halaman Selesai
     if (finished) {
         return (
             <div className="min-h-screen flex items-center justify-center">
@@ -88,17 +111,18 @@ export default function Question() {
         );
     }
 
-
+    // Card Pertanyaan
     return (
         <>
             <div className="min-h-screen flex items-center justify-center">
+                {timer}
                 <QuestionCard
                     question={questions[current]}
                     questionNumber={current + 1}
                     total={questions.length}
                     onAnswer={handleAnswer}
                 />
-            </div>
+            </div >
         </>
     )
 }
