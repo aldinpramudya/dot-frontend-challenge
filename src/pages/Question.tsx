@@ -10,6 +10,8 @@ export default function Question() {
     const [questions, setQuestions] = useState([]);
     const [current, setCurrent] = useState(0);
     const [score, setScore] = useState(0);
+    const [correctAnswer, setCorrectAnswer] = useState(0);
+    const [wrongAnswer, setWrongAnswer] = useState(0);
     const [finished, setFinished] = useState(false);
     const [loading, setLoading] = useState(true);
 
@@ -33,9 +35,12 @@ export default function Question() {
             })
     }, []);
 
-    const handleAnswer = (answer: string): void => {
+    const handleAnswer = (answer: string): void => {        
         if (answer === questions[current].correct) {
             setScore((prev) => prev + 1);
+            setCorrectAnswer((prev) => prev + 1);
+        } else {
+            setWrongAnswer((prev) => prev + 1);
         }
 
         const next = current + 1;
@@ -60,6 +65,12 @@ export default function Question() {
                     <h2 className="text-2xl font-semibold mb-4">Quiz Finished 🎉</h2>
                     <p className="text-lg">
                         Your score: {score} / {questions.length}
+                    </p>
+                    <p className="text-lg">
+                        Correct Answer: {correctAnswer}
+                    </p>
+                    <p className="text-lg">
+                        Wrong Answer: {wrongAnswer}
                     </p>
                     <div className="space-x-3">
                         <button
